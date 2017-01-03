@@ -3,6 +3,9 @@
 
 USING_NS_CC;
 
+float getRandomFloat(float a, float b);
+int getRandomInt(int a, int b);
+
 Scene* GameScene::createScene()
 {
     auto scene = Scene::create();
@@ -16,7 +19,7 @@ bool GameScene::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !LayerColor::initWithColor(ccc4(0,0,0,0)) )
+    if (!LayerColor::initWithColor(ccc4(0,0,0,0)) )
     {
         return false;
     }
@@ -31,9 +34,8 @@ bool GameScene::init()
     this->addChild(_ship->getShieldSprites()[1], 2);
     this->addChild(_ship->getShieldSprites()[2], 2);
     
-    _timeToNextAsteroid = 0;
-    
-    SpawnAsteroid(3, Vec2(visibleSize.width + origin.x + 40.0f, visibleSize.height + origin.y), Vec2(50.0f, 20.0f), false);
+    _timeToNextAsteroid = 0.0f;
+    _holdTime = 0.0f;
     
     this->scheduleUpdate();
     
@@ -181,23 +183,17 @@ bool GameScene::checkCollision()
 
 void GameScene::SpawnAsteroid(int health, Vec2 startPosition, Vec2 moveVector, bool isSplitAsteroid)
 {
-//    Size visibleSize = Director::getInstance()->getVisibleSize();
-//    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-//    
-//    Vec2 moveVector = Vec2(80.0f, 50.0f);
-//    Vec2 startPosition = Vec2(visibleSize.width + origin.x + 40.0f, visibleSize.height + origin.y);
-    
     Sprite *sprite = NULL;
     
     switch(health) {
         case 1:
-            sprite = Sprite::createWithSpriteFrameName("meteorBrown_small1.png");
+            sprite = Sprite::createWithSpriteFrameName("meteorBrown_med3.png");
             break;
         case 2:
-            sprite = Sprite::createWithSpriteFrameName("meteorBrown_med1.png");
+            sprite = Sprite::createWithSpriteFrameName("meteorBrown_big3.png");
             break;
         case 3:
-            sprite = Sprite::createWithSpriteFrameName("meteorBrown_big1.png");
+            sprite = Sprite::createWithSpriteFrameName("meteorBrown_big4.png");
             break;
         default:
             sprite = Sprite::createWithSpriteFrameName("meteorBrown_big4.png");
@@ -211,10 +207,80 @@ void GameScene::SpawnAsteroid(int health, Vec2 startPosition, Vec2 moveVector, b
     this->addChild(asteroid->getSprite());
 }
 
+int getRandomInt(int a, int b)
+{
+    return a + (rand() % (int)(b - a + 1));
+}
+
+float getRandomFloat(float a, float b)
+{
+    float random = ((float) rand()) / (float) RAND_MAX;
+    float diff = b - a;
+    float toReturn = random * diff;
+    return a + toReturn;
+}
+
 void GameScene::manageAsteroidSpawns(float delta)
 {
+    _holdTime += delta;
+    if (_holdTime >= _timeToNextAsteroid) {
+        int side = getRandomInt(1,3);
+        switch(side) {
+            case 1:
+                createAsteroidLeft();
+                break;
+            case 2:
+                createAsteroidTop();
+                break;
+            case 3:
+                createAsteroidRight();
+                break;
+            default:
+                createAsteroidTop();
+                break;
+        }
+        _holdTime = 0.0f;
+        _timeToNextAsteroid = 1.0f;
+    }
     
+    return;
 }
+
+void GameScene::createAsteroidLeft()
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    SpawnAsteroid(3, Vec2(origin.x - _offDistance, (visibleSize.height * 0.8f) + origin.y), Vec2(30.0f, 30.0f), false);
+}
+
+void GameScene::createAsteroidTop()
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    SpawnAsteroid(3, Vec2((visibleSize.width / 3.0f) + origin.x, visibleSize.height + origin.y + _offDistance), Vec2(5.0f, 40.0f), false);
+}
+
+void GameScene::createAsteroidRight()
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    SpawnAsteroid(3, Vec2(visibleSize.width + origin.x + _offDistance, (visibleSize.height * 0.8f) + origin.y), Vec2(30.0f, 30.0f), false);
+}
+
+float GameScene::getSideDistanceVariation()
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    return getRandomFloat(0.0f, visibleSize.height/2.0);
+}
+
+float GameScene::getTopDistanceVariation()
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    return getRandomFloat(0.0f, visibleSize.width);
+}
+
 
 void GameScene::SplitAsteroid()
 {
@@ -228,8 +294,15 @@ void GameScene::SplitAsteroid()
             (*j)->setToRemove();
             int HP = (*j)->getHP();
             Vec2 startPosition = Vec2((*j)->getPosition().x, (*j)->getPosition().y);
-            Vec2 moveVector1 = Vec2((*j)->getMoveVector().x, (*j)->getMoveVector().y);
-            Vec2 moveVector2 = Vec2((*j)->getMoveVector().x*(-1.0f), (*j)->getMoveVector().y);
+            float moveVec1x, moveVec1y, moveVec2x, moveVec2y;
+            
+            moveVec1x = (*j)->getMoveVector().x * getRandomFloat(0.5f, 2.0f);
+            moveVec1y = (*j)->getMoveVector().y * getRandomFloat(0.5f, 2.0f);
+            moveVec2x = (*j)->getMoveVector().x * getRandomFloat(0.5f, 2.0f) * (-1.0f);
+            moveVec2y = (*j)->getMoveVector().y * getRandomFloat(0.5f, 2.0f);
+            
+            Vec2 moveVector1 = Vec2(moveVec1x, moveVec1y);
+            Vec2 moveVector2 = Vec2(moveVec2x, moveVec2y);
             if (HP >= 1)
             {
                 SpawnAsteroid(HP, startPosition, moveVector1, true);
@@ -242,6 +315,7 @@ void GameScene::SplitAsteroid()
 
 void GameScene::update(float delta)
 {
+    manageAsteroidSpawns(delta);
     ShipIsOutOfBounds();
     _ship->showShieldSprite();
     _ship->updatePosition();

@@ -49,11 +49,6 @@ bool Asteroid::isTouchingSprite(cocos2d::Touch *touch)
     return (_sprite->getPosition().getDistance(_touch) < getSpriteRect().size.width);
 }
 
-void Asteroid::bindSprite(Sprite* sprite)
-{
-    _sprite = sprite;
-}
-
 const Rect& Asteroid::getSpriteRect()
 {
     return _sprite->getTextureRect();
@@ -90,11 +85,6 @@ Vec2& Asteroid::getPosition()
 Rect Asteroid::getHitBox()
 {
     return _sprite->getBoundingBox();
-}
-
-int Asteroid::health()
-{
-    return _health;
 }
 
 cocos2d::Sprite* Asteroid::getSprite() {

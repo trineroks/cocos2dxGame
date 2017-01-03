@@ -12,8 +12,6 @@ public:
     ~Asteroid();
     bool isTouchingSprite(Touch* touch);
     bool isRightStarting();
-    int health();
-    void bindSprite(Sprite* sprite);
     
     void setPosition(const Vec2 &position);
     void incrementPosition(float delta);
