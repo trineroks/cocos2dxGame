@@ -250,28 +250,28 @@ void GameScene::createAsteroidLeft()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    SpawnAsteroid(3, Vec2(origin.x - _offDistance, (visibleSize.height * 0.8f) + origin.y), Vec2(30.0f, 30.0f), false);
+    SpawnAsteroid(3, Vec2(origin.x - _offDistance, getSideDistanceVariation() + origin.y), Vec2(30.0f, 30.0f), false);
 }
 
 void GameScene::createAsteroidTop()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    SpawnAsteroid(3, Vec2((visibleSize.width / 3.0f) + origin.x, visibleSize.height + origin.y + _offDistance), Vec2(5.0f, 40.0f), false);
+    SpawnAsteroid(3, Vec2(getTopDistanceVariation() + origin.x, visibleSize.height + origin.y + _offDistance), Vec2(5.0f, 40.0f), false);
 }
 
 void GameScene::createAsteroidRight()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    SpawnAsteroid(3, Vec2(visibleSize.width + origin.x + _offDistance, (visibleSize.height * 0.8f) + origin.y), Vec2(30.0f, 30.0f), false);
+    SpawnAsteroid(3, Vec2(visibleSize.width + origin.x + _offDistance, getSideDistanceVariation() + origin.y), Vec2(30.0f, 30.0f), false);
 }
 
 float GameScene::getSideDistanceVariation()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    return getRandomFloat(0.0f, visibleSize.height/2.0);
+    return getRandomFloat(visibleSize.height/2.0, visibleSize.height);
 }
 
 float GameScene::getTopDistanceVariation()
@@ -284,8 +284,6 @@ float GameScene::getTopDistanceVariation()
 
 void GameScene::SplitAsteroid()
 {
-    //NOTE TO FUTURE SELF: WHEN YOU ADD TO THIS VECTOR THE POINTER THE ITERATOR POINTS TO IS NOT GUARANTEED
-    //TO BE THE SAME OBJECT. PROBABLY DUE TO SHIFTING IN MEMORY OR SOMETHING
     for (std::vector<Asteroid*>::iterator j = _asteroids.begin(); j != _asteroids.end(); j++)
     {
         if((*j)->getToSplit())
