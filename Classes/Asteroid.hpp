@@ -8,6 +8,8 @@ USING_NS_CC;
 class Asteroid : public cocos2d::Node
 {
 public:
+    const float _timeToRemoveWhenOffscreen = 5.0f;
+    
     Asteroid(int health, Vec2 position, Vec2 moveVector, Sprite *sprite, bool isSplitAsteroid);
     ~Asteroid();
     bool isTouchingSprite(Touch* touch);
@@ -44,7 +46,15 @@ public:
     
     bool getSplitAsteroid() {
         return _isSplitAsteroid;
-    }
+    };
+    
+    bool getHasEnteredScene() {
+        return _hasEnteredScene;
+    };
+    
+    void hasEnteredScene() {
+        _hasEnteredScene = true;
+    };
     
     int getHP() {
         return _health;
@@ -58,6 +68,7 @@ private:
     bool _toRemove;
     bool _toSplit;
     bool _isSplitAsteroid;
+    bool _hasEnteredScene;
     Vec2 _position;
     Vec2 _moveVector;
     int _health;

@@ -17,6 +17,7 @@ Asteroid::Asteroid(int health, Vec2 position, Vec2 moveVector, Sprite *sprite, b
     
     if (!_isSplitAsteroid)
     {
+        _hasEnteredScene = false;
         if (_position.x >= visibleSize.width + origin.x)
         {
             _rightStarting = true;
@@ -30,6 +31,7 @@ Asteroid::Asteroid(int health, Vec2 position, Vec2 moveVector, Sprite *sprite, b
     }
     else {
         _moveVector.x = moveVector.x;
+        _hasEnteredScene = true;
     }
     
     _moveVector.y = moveVector.y;
