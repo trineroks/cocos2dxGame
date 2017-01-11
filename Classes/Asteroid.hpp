@@ -20,6 +20,14 @@ public:
     Vec2& getPosition();
     void updatePosition();
     
+    float getTimeOffScreen() {
+        return _timeOffScreen;
+    };
+    
+    void incrementTimeOffScreen(float delta) {
+        _timeOffScreen += delta;
+    };
+    
     Vec2& getMoveVector() {
         return _moveVector;
     };
@@ -69,6 +77,7 @@ private:
     bool _toSplit;
     bool _isSplitAsteroid;
     bool _hasEnteredScene;
+    float _timeOffScreen;
     Vec2 _position;
     Vec2 _moveVector;
     int _health;

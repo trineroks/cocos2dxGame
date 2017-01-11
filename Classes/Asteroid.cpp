@@ -13,6 +13,8 @@ Asteroid::Asteroid(int health, Vec2 position, Vec2 moveVector, Sprite *sprite, b
     _toRemove = false;
     _toSplit = false;
     
+    _timeOffScreen = 0.0f;
+    
     _isSplitAsteroid = isSplitAsteroid;
     
     if (!_isSplitAsteroid)

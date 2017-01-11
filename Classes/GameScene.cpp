@@ -120,31 +120,52 @@ bool GameScene::ShipIsOutOfBounds()
     return false;
 }
 
-void GameScene::AsteroidIsOutOfBounds()
+bool GameScene::AsteroidIsOutOfBounds(Asteroid *asteroid)
+{
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    Vec2 pos = asteroid->getPosition();
+    if (pos.y <= origin.y - _offDistance ||
+        pos.y >= origin.y + visibleSize.height + _offDistance ||
+        pos.x <= origin.x - _offDistance ||
+        pos.x >= origin.x + visibleSize.width + _offDistance)
+    {
+        return true;
+    }
+    return false;
+}
+
+void GameScene::AsteroidEnteredScreen()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     for (std::vector<Asteroid*>::iterator j = _asteroids.begin(); j != _asteroids.end(); j++)
     {
-        if ((*j)->getPosition().y <= origin.y - _offDistance)
+        if (!(*j)->getHasEnteredScene())
         {
-            (*j)->setToRemove();
-        }
-        else if ((*j)->getSplitAsteroid())
-        {
-            if ((*j)->getPosition().x <= origin.x - _offDistance ||
-                (*j)->getPosition().x >= origin.x + visibleSize.width + _offDistance)
-                (*j)->setToRemove();
-        }
-        else
-        {
-            if ((*j)->isRightStarting() && (*j)->getPosition().x <= origin.x - _offDistance)
+            Vec2 pos = (*j)->getPosition();
+            if (pos.y >= origin.y &&
+                pos.y <= origin.y + visibleSize.height &&
+                pos.x >= origin.x &&
+                pos.x <= origin.x + visibleSize.width)
             {
-                (*j)->setToRemove();
+                (*j)->hasEnteredScene();
             }
-            else if (!(*j)->isRightStarting() && (*j)->getPosition().x >= origin.x + visibleSize.width + _offDistance)
+        }
+    }
+}
+
+void GameScene::AsteroidOutOfScreenForTooLong(float delta)
+{
+    for (std::vector<Asteroid*>::iterator j = _asteroids.begin(); j != _asteroids.end(); j++)
+    {
+        if (!(*j)->getHasEnteredScene() && !(*j)->getToRemove())
+        {
+            if (AsteroidIsOutOfBounds(*j))
             {
-                (*j)->setToRemove();
+                (*j)->incrementTimeOffScreen(delta);
+                if ((*j)->getTimeOffScreen() >= _maxTimeOffScreen)
+                    (*j)->setToRemove();
             }
         }
     }
@@ -321,6 +342,6 @@ void GameScene::update(float delta)
         (*j)->incrementPosition(delta);
     checkCollision();
     SplitAsteroid();
-    AsteroidIsOutOfBounds();
+    AsteroidOutOfScreenForTooLong(delta);
     cleanUpAsteroids();
 }

@@ -23,6 +23,7 @@ private:
     const float _offDistance = 30.0f;
     const float _maxSpeed = 80.0f;
     const float _minSpeed = 20.0f;
+    const float _maxTimeOffScreen = 10.0f;
     float _timeToNextAsteroid;
     float _holdTime;
     
@@ -42,7 +43,9 @@ private:
     bool isColliding(Rect target, Rect collider);
     bool ShipIsOutOfBounds();
     bool checkCollision();
-    void AsteroidIsOutOfBounds();
+    bool AsteroidIsOutOfBounds(Asteroid *asteroid);
+    void AsteroidEnteredScreen();
+    void AsteroidOutOfScreenForTooLong(float delta);
     void cleanUpAsteroids();
     
     void manageAsteroidSpawns(float delta);
